@@ -18,5 +18,12 @@
   "bugs": {
     "url": "https://github.com/Vishnu-R-8848/e-com-api-task/issues"
   },
-  "homepage": "https://github.com/Vishnu-R-8848/e-com-api-task#readme"
+  "homepage": "https://github.com/Vishnu-R-8848/e-com-api-task#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "nodemon": "^3.1.14"
+  }
 }

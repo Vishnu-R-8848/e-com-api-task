@@ -7,8 +7,24 @@ export const createProduct = async (req, res) => {
     const { name, description, price, category } = req.body;
 
     // Validate textual fields
-    if (!name || !description || !price || !category) {
-      return res.status(400).json({ message: "All text fields are required" });
+    if (!name) {
+      return res.status(400).json({ message: "Product name is required" });
+    }
+
+    if (!description) {
+      return res
+        .status(400)
+        .json({ message: "Product description is required" });
+    }
+
+    if (!price || isNaN(price) || price < 0) {
+      return res
+        .status(400)
+        .json({ message: "Valid product price is required" });
+    }
+
+    if (!category) {
+      return res.status(400).json({ message: "Product category is required" });
     }
 
     // Ensure files actually exist in multi-part payload
@@ -34,12 +50,16 @@ export const createProduct = async (req, res) => {
     const processedImages = await Promise.all(uploadPromises);
 
     // Create and save new product document populated with full asset details
+    // Inside your createProduct controller function...
+
+    // Create and save new product document populated with full asset details and ownership link
     const newProduct = new ProductModel({
       name,
       description,
       price,
       category,
       images: processedImages,
+      createdBy: req.user.userId, // 👈 Grabs the verified ID straight from your JWT cookie payload!
     });
 
     const savedProduct = await newProduct.save();
@@ -48,6 +68,8 @@ export const createProduct = async (req, res) => {
     console.error("Error creating product:", error);
     res.status(500).json({ message: "Server error during creation" });
   }
+
+  return res.status(201).json({ message: "Product created successfully" });
 };
 
 export const getProducts = async (req, res) => {

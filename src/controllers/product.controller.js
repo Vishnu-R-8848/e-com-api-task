@@ -1,5 +1,5 @@
 // controllers/productController.js
-import ProductModel from "../models/Product.js";
+import ProductModel from "../models/product.model.js";
 import { uploadToImageKit } from "../middleware/uploadMiddleware.js";
 
 export const createProduct = async (req, res) => {

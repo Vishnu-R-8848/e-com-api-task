@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema(
   {
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: [true, "A product must be linked to a creator account"],
+    },
     name: {
       type: String,
       required: true,

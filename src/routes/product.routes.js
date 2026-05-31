@@ -13,9 +13,9 @@ import {
 
 // Define routes
 router.post("/create", createProduct);
-router.get("/products", getProducts);
-router.get("/products/:id", getProductById);
-router.put("/products/:id", updateProduct);
-router.delete("/products/:id", deleteProduct);
+router.get("/get-all", getProducts);
+router.get("/get/:id", getProductById);
+router.put("/update/:id", updateProduct);
+router.delete("/delete/:id", deleteProduct);
 
 export default router;

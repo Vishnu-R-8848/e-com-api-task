@@ -50,7 +50,7 @@ export const registerUser = async (req, res) => {
   const newUser = await UserModel.create({
     username,
     email,
-    password: await bcrypt.hash(password, 10),
+    password,
   });
 
   // Create a JWT token that stores safe user identity data for future authenticated requests.
@@ -120,7 +120,7 @@ export const loginUser = async (req, res) => {
   // ---- using the method defined in the user model to compare passwords ----
 
   // Compare the submitted plain password with the hashed password stored in MongoDB.
-  if(!(await user.matchPassword(password))) {
+  if (!(await user.matchPassword(password))) {
     return res.status(401).json({ error: "Invalid credentials" });
   }
 

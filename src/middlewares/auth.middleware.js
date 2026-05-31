@@ -1,17 +1,30 @@
-// middleware/validateProduct.js
-export const validateProductData = (req, res, next) => {
-  const { name, price, category } = req.body;
+import jwt from "jsonwebtoken";
 
-  // 1. Check if required body data exists
-  if (!name || !price || !category) {
-    return res.status(400).json({ message: "Validation Failed: Missing required fields." });
+const authMiddleware = (req, res, next) => {
+  // Extract the token dynamically parsed from the browser cookie container
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res
+      .status(401)
+      .json({ error: "Unauthorized: Access token missing" });
   }
 
-  // 2. Enforce numerical business rules
-  if (Number(price) <= 0) {
-    return res.status(400).json({ message: "Validation Failed: Price must be a positive number." });
-  }
+  try {
+    // 🔐 CRITICAL SECURITY FIX: Verify token integrity using your secret key
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-  // If everything passes, pass control gracefully to the next block
-  next();
+    // 🔥 DATA INJECTION: Pass the token's decrypted user payload onto the request lifecycle
+    // This makes req.user.email immediately available to your next controller function!
+    req.user = decoded;
+
+    next(); // Pass control gracefully to your controller
+  } catch (error) {
+    console.error("JWT Verification Error:", error);
+    return res
+      .status(401)
+      .json({ error: "Unauthorized: Invalid or expired token signature" });
+  }
 };
+
+export default authMiddleware;

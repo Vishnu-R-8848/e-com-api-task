@@ -1,26 +1,47 @@
-import express from "express";
 import mongoose from "mongoose";
-import { registerUser, loginUser } from "../controllers/auth.controller.js";
+import bcrypt from "bcrypt";
 
-import UserModel from "../models/users.model.js";
+const userSchema = new mongoose.Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 3,
+      maxlength: 30,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+  },
+  { timestamps: true },
+);
 
-// Router groups all authentication endpoints together.
-const router = express.Router();
+const UserModel = mongoose.model("User", userSchema);
 
-/**
- * @route POST /api/auth/register
- * @desc Register a new user and store the JWT in a cookie
- * @access Public
- */
-// Sends registration requests to the registerUser controller.
-router.post("/register", registerUser);
+export default UserModel;
 
-/**
- * @route POST /api/auth/login
- * @desc Login a user and store the JWT in a cookie
- * @access Public
- */
-// Sends login requests to the loginUser controller.
-router.post("/login", loginUser);
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    return next();
+  }
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
-export default router;
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
